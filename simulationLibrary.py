@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+import os
 
 ################################################ Numerical Methods #########################################################################################################
 
@@ -130,3 +131,95 @@ class PointMassBody:
         self.position = position
         self.velocity = velocity
         self.acceleration = acceleration
+
+
+###################################################### Lorenz Attractor Stuff ########################################################################################################
+                
+def lorenz(xyz, s=10, r=28, b=2.667):
+    """
+    Parameters
+    ----------
+    xyz : array-like, shape (3,)
+       Point of interest in three-dimensional space.
+    s, r, b : float
+       Parameters defining the Lorenz attractor.
+
+    Returns
+    -------
+    xyz_dot : array, shape (3,)
+       Values of the Lorenz attractor's partial derivatives at *xyz*.
+    """
+    x, y, z = xyz
+    x_dot = s*(y - x)
+    y_dot = r*x - y - x*z
+    z_dot = x*y - b*z
+    return np.array([x_dot, y_dot, z_dot])
+
+# lorenzAttractorImage() produces an image of a Lorenz Attractor System after 'length' amount of iterations. Also takes system parameters s, r, and b. Default value is just a known value that gives a known result to use as sanity checks
+def lorenzAttractorImage(length, s=10, r=28, b=2.667):
+    dt = 0.01
+    num_steps = length
+
+    xyzs = np.empty((num_steps + 1, 3))  # Need one more for the initial values
+    xyzs[0] = (0., 1., 1.05)  # Set initial values
+    # Step through "time", calculating the partial derivatives at the current point
+    # and using them to estimate the next point
+    for i in range(num_steps):
+        xyzs[i + 1] = xyzs[i] + lorenz(xyzs[i],s,r,b) * dt
+
+    # Plot
+    ax = plt.figure().add_subplot(projection='3d')
+
+    ax.plot(*xyzs.T, lw=0.5)
+    ax.set_xlabel("X Axis")
+    ax.set_ylabel("Y Axis")
+    ax.set_zlabel("Z Axis")
+    ax.set_title("Lorenz Attractor")
+
+    plt.show()
+
+# lorenzAttractorTrace() takes in the amount of frames you want to video to be along with the system paramters s, r and b. Default value is just a known value that gives a known result to use as sanity checks
+# Will save images to target directory where you will then have to run ffmpeg through the command line to use. Ffmpeg comand is given in the next line
+# ffmpeg -start_number 0 -framerate 60 -i graph%01d.png video.webm
+
+def lorenzAttractorTrace(frames, s=10, r=28, b=2.667):
+    #Empty the target directory
+    dir = './Images for simulation'
+
+    for f in os.listdir(dir):
+        os.remove(os.path.join(dir, f))
+
+    #Calculate the array of points according to the lorenz system
+    #Do this outside the main loop so that we only calculate it once rather than a bazillion times and annihilate memory
+    dt = 0.01
+    numSteps = frames
+
+    xyzs = np.empty((numSteps+1, 3))  # Need one more for the initial values
+    xyzs[0] = (0., 1., 1.05)  # Set initial values
+    for i in range(numSteps):
+        xyzs[i + 1] = xyzs[i] + lorenz(xyzs[i],s,r,b) * dt
+
+    #plot the first frame outside of the main loop, same idea as initial conditions just with a frame
+    ax = plt.figure().add_subplot(projection='3d')
+    ax.plot(*xyzs[0].T, lw=0.5)
+    ax.set_xlabel("X Axis")
+    ax.set_ylabel("Y Axis")
+    ax.set_zlabel("Z Axis")
+    ax.set_title("Lorenz Attractor")
+    plt.savefig('./Images for simulation/graph'+str(0)+'.png')
+    plt.close('all')
+
+    #Initialize frame to 1 so that our indexing for xyzs in the main loop prints from 0-frame. If frame was 0 then we would be plotting xysz from xyzs[0] ot xyzs[0] which we cant do. We need atleast xyzs[0] to xyzs[1]
+    frame = 1
+    while frame < numSteps:
+            ax = plt.figure().add_subplot(projection='3d')
+            ax.plot(*xyzs[:frame].T, lw=0.5) #Recall this [:frame] notion means we plot the array from xyzs[0] to xyzs[frame]
+            ax.set_xlabel("X Axis")
+            ax.set_ylabel("Y Axis")
+            ax.set_zlabel("Z Axis")
+            ax.set_title("Lorenz Attractor")
+
+            plt.savefig('./Images for simulation/graph'+str(frame)+'.png')
+            plt.close('all')
+
+            frame = frame + 1
