@@ -3,6 +3,14 @@ import matplotlib.pyplot as plt
 import math
 import os
 
+################################################ Quality of Life #############################################################################################################################################
+
+# clearDirectory() just clearned the "Images for simulation" directory so that we can save over it without any overlap
+def clearDirectory():
+    dir = './Images for simulation'
+    for f in os.listdir(dir):
+        os.remove(os.path.join(dir, f))
+
 ################################################ Numerical Methods #########################################################################################################
 
 # eulersMethod(): Generalized Function that takes in the stepsize, initial conditions and said function from previous cell and returns
@@ -134,7 +142,8 @@ class PointMassBody:
 
 
 ###################################################### Lorenz Attractor Stuff ########################################################################################################
-                
+
+# Not my own code, got it from DrM at https://matplotlib.org/stable/gallery/mplot3d/lorenz_attractor.html     
 def lorenz(xyz, s=10, r=28, b=2.667):
     """
     Parameters
@@ -181,7 +190,6 @@ def lorenzAttractorImage(length, s=10, r=28, b=2.667):
 # lorenzAttractorTrace() takes in the amount of frames you want to video to be along with the system paramters s, r and b. Default value is just a known value that gives a known result to use as sanity checks
 # Will save images to target directory where you will then have to run ffmpeg through the command line to use. Ffmpeg comand is given in the next line
 # ffmpeg -start_number 0 -framerate 60 -i graph%01d.png video.webm
-
 def lorenzAttractorTrace(frames, s=10, r=28, b=2.667):
     #Empty the target directory
     dir = './Images for simulation'
