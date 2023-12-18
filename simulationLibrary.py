@@ -5,9 +5,10 @@ import os
 
 ################################################ Quality of Life #############################################################################################################################################
 
-# clearDirectory() just clearned the "Images for simulation" directory so that we can save over it without any overlap
-def clearDirectory():
-    dir = './Images for simulation'
+# clearDirectory() just clearned the "Images for simulation" directory so that we can save over it without any overlap.
+# Default argument is for the 'Images for Simulation' directory since thats where we do most of our work but incase we need to change it we can put in whatever
+def clearDirectory(direc='./Images for simulation'):
+    dir = direc
     for f in os.listdir(dir):
         os.remove(os.path.join(dir, f))
 
@@ -15,7 +16,6 @@ def clearDirectory():
 
 # eulersMethod(): Generalized Function that takes in the stepsize, initial conditions and said function from previous cell and returns
 # a 2d array where the first entry is the array of x-values and the second entry is the array of approximated y-values
-
 def eulersMethod(function, stepSize, initialPair, intervalLength):
     y0=initialPair[1]
     x0=initialPair[0]
@@ -166,7 +166,7 @@ def lorenz(xyz, s=10, r=28, b=2.667):
 
 # lorenzAttractorImage() produces an image of a Lorenz Attractor System after 'length' amount of iterations. Also takes system parameters s, r, and b. Default value is just a known value that gives a known result to use as sanity checks
 # 'save' parameter allows you to save the image incase you find something cool
-def lorenzAttractorImage(length, s=10, r=28, b=2.667, save=False):
+def lorenzAttractorImage(length, s=10, r=28, b=2.667, save=False, clean=False):
     dt = 0.01
     num_steps = length
 
@@ -185,14 +185,19 @@ def lorenzAttractorImage(length, s=10, r=28, b=2.667, save=False):
     ax.set_ylabel("Y Axis")
     ax.set_zlabel("Z Axis")
     ax.set_title("Lorenz Attractor")
+    if clean == True:
+        ax.grid(None)
+        ax.axis('off')
+    else:
+        pass
     
     #Add labels for the system parameters. the {:.2f}.format() allows us to print the first two decimal points of a floating point number
-    ax.text2D(0.05, 0.95, r"$\sigma$="+str("{:.2f}".format(s)), transform=ax.transAxes)
+    ax.text2D(0.05, 0.95, r"$\sigma$="+str("{:.3f}".format(s)), transform=ax.transAxes)
     ax.text2D(0.05, 1.0, r"$\rho$="+str("{:.2f}".format(r)), transform=ax.transAxes)
     ax.text2D(0.05, 1.05, r"$\beta$="+str("{:.2f}".format(b)), transform=ax.transAxes)
     
     if save == True:
-        plt.savefig('./Images for simulation/graph'+str(j)+'.png')
+        plt.savefig('./Images for simulation/graph'+str(j)+'.png', dpi=300)
         plt.close('all')
     else:
         plt.show()
@@ -200,8 +205,7 @@ def lorenzAttractorImage(length, s=10, r=28, b=2.667, save=False):
 # lorenzAttractorTrace() takes in the amount of frames you want to video to be along with the system paramters s, r and b. Default value is just a known value that gives a known result to use as sanity checks
 # Will save images to target directory where you will then have to run ffmpeg through the command line to use. Ffmpeg comand is given in the next line
 # ffmpeg -start_number 0 -framerate 60 -i graph%01d.png video.webm
-
-def lorenzAttractorTrace(frames, s=10, r=28, b=2.667):
+def lorenzAttractorTrace(frames, s=10, r=28, b=2.667, clean=False, rotation=False):
     #Empty the target directory
     clearDirectory()
 
@@ -215,29 +219,73 @@ def lorenzAttractorTrace(frames, s=10, r=28, b=2.667):
     for i in range(numSteps):
         xyzs[i + 1] = xyzs[i] + lorenz(xyzs[i],s,r,b) * dt
 
-    #plot the first frame outside of the main loop, same idea as initial conditions just with a frame
-    ax = plt.figure().add_subplot(projection='3d')
-    ax.plot(*xyzs[0].T, lw=0.5)
-    ax.set_xlabel("X Axis")
-    ax.set_ylabel("Y Axis")
-    ax.set_zlabel("Z Axis")
-    ax.set_title("Lorenz Attractor")
-    plt.savefig('./Images for simulation/graph'+str(0)+'.png')
-    plt.close('all')
-
-    #Initialize frame to 1 so that our indexing for xyzs in the main loop prints from 0-frame. If frame was 0 then we would be plotting xysz from xyzs[0] ot xyzs[0] which we cant do. We need atleast xyzs[0] to xyzs[1]
-    frame = 1
-    while frame < numSteps:
+    # Checking if the attractor is clean or not to determine what the first frame should look like     
+    if clean == True:
+        #plot the first frame outside of the main loop, same idea as initial conditions just with a frame
+        ax = plt.figure().add_subplot(projection='3d')
+        ax.plot(*xyzs[0].T, lw=0.5)
+        ax.set_xlabel("X Axis")
+        ax.set_ylabel("Y Axis")
+        ax.set_zlabel("Z Axis")
+        ax.grid(None)
+        ax.axis('off')
+        plt.savefig('./Images for simulation/graph'+str(0)+'.png')
+        plt.close('all')
+    else:
+        #plot the first frame outside of the main loop, same idea as initial conditions just with a frame
+        ax = plt.figure().add_subplot(projection='3d')
+        ax.plot(*xyzs[0].T, lw=0.5)
+        ax.set_xlabel("X Axis")
+        ax.set_ylabel("Y Axis")
+        ax.set_zlabel("Z Axis")
+        ax.set_title("Lorenz Attractor")
+        plt.savefig('./Images for simulation/graph'+str(0)+'.png')
+        plt.close('all')
+    
+    #Non-rotation video
+    if rotation == False:
+        #Initialize frame to 1 so that our indexing for xyzs in the main loop prints from 0-frame. If frame was 0 then we would be plotting xysz from xyzs[0] ot xyzs[0] which we cant do. We need atleast xyzs[0] to xyzs[1]
+        frame = 1
+        while frame < numSteps:
             ax = plt.figure().add_subplot(projection='3d')
             ax.plot(*xyzs[:frame].T, lw=0.5) #Recall this [:frame] notion means we plot the array from xyzs[0] to xyzs[frame]
-            ax.legend()
             ax.set_xlabel("X Axis")
             ax.set_ylabel("Y Axis")
             ax.set_zlabel("Z Axis")
-            ax.set_title("Lorenz Attractor")
-            
-            
-            plt.savefig('./Images for simulation/graph'+str(frame)+'.png', dpi=600) # dpi argument increases resolution
+            plt.xlim((-25,25))
+            plt.ylim((-30,35))
+            ax.set_zlim(0,60)
+            if clean == True:
+                ax.grid(None)
+                ax.axis('off')
+            else:
+                ax.set_title("Lorenz Attractor")
+                pass
+            plt.savefig('./Images for simulation/graph'+str(frame)+'.png', dpi=450) # dpi argument increases resolution
             plt.close('all')
-
             frame = frame + 1
+    #Rotation video, add in the ax.view_init() function which takes in spherical coordinate
+    else:
+        #Initialize frame to 1 so that our indexing for xyzs in the main loop prints from 0-frame. If frame was 0 then we would be plotting xysz from xyzs[0] ot xyzs[0] which we cant do. We need atleast xyzs[0] to xyzs[1]
+        frame = 1
+        angle = 0
+        while frame < numSteps:
+            ax = plt.figure().add_subplot(projection='3d')
+            ax.plot(*xyzs[:frame].T, lw=0.5) #Recall this [:frame] notion means we plot the array from xyzs[0] to xyzs[frame]
+            ax.set_xlabel("X Axis")
+            ax.set_ylabel("Y Axis")
+            ax.set_zlabel("Z Axis")
+            plt.xlim((-25,25))
+            plt.ylim((-30,35))
+            ax.set_zlim(0,60)
+            ax.view_init(30,angle)
+            if clean == True:
+                ax.grid(None)
+                ax.axis('off')
+            else:
+                ax.set_title("Lorenz Attractor")
+                pass
+            plt.savefig('./Images for simulation/graph'+str(frame)+'.png', dpi=450) # dpi argument increases resolution
+            plt.close('all')
+            frame = frame + 1
+            angle = angle + 1
