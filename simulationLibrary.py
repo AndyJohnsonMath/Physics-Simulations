@@ -165,7 +165,8 @@ def lorenz(xyz, s=10, r=28, b=2.667):
     return np.array([x_dot, y_dot, z_dot])
 
 # lorenzAttractorImage() produces an image of a Lorenz Attractor System after 'length' amount of iterations. Also takes system parameters s, r, and b. Default value is just a known value that gives a known result to use as sanity checks
-def lorenzAttractorImage(length, s=10, r=28, b=2.667):
+# 'save' parameter allows you to save the image incase you find something cool
+def lorenzAttractorImage(length, s=10, r=28, b=2.667, save=False):
     dt = 0.01
     num_steps = length
 
@@ -184,18 +185,25 @@ def lorenzAttractorImage(length, s=10, r=28, b=2.667):
     ax.set_ylabel("Y Axis")
     ax.set_zlabel("Z Axis")
     ax.set_title("Lorenz Attractor")
-
-    plt.show()
+    
+    #Add labels for the system parameters. the {:.2f}.format() allows us to print the first two decimal points of a floating point number
+    ax.text2D(0.05, 0.95, r"$\sigma$="+str("{:.2f}".format(s)), transform=ax.transAxes)
+    ax.text2D(0.05, 1.0, r"$\rho$="+str("{:.2f}".format(r)), transform=ax.transAxes)
+    ax.text2D(0.05, 1.05, r"$\beta$="+str("{:.2f}".format(b)), transform=ax.transAxes)
+    
+    if save == True:
+        plt.savefig('./Images for simulation/graph'+str(j)+'.png')
+        plt.close('all')
+    else:
+        plt.show()
 
 # lorenzAttractorTrace() takes in the amount of frames you want to video to be along with the system paramters s, r and b. Default value is just a known value that gives a known result to use as sanity checks
 # Will save images to target directory where you will then have to run ffmpeg through the command line to use. Ffmpeg comand is given in the next line
 # ffmpeg -start_number 0 -framerate 60 -i graph%01d.png video.webm
+
 def lorenzAttractorTrace(frames, s=10, r=28, b=2.667):
     #Empty the target directory
-    dir = './Images for simulation'
-
-    for f in os.listdir(dir):
-        os.remove(os.path.join(dir, f))
+    clearDirectory()
 
     #Calculate the array of points according to the lorenz system
     #Do this outside the main loop so that we only calculate it once rather than a bazillion times and annihilate memory
@@ -222,12 +230,14 @@ def lorenzAttractorTrace(frames, s=10, r=28, b=2.667):
     while frame < numSteps:
             ax = plt.figure().add_subplot(projection='3d')
             ax.plot(*xyzs[:frame].T, lw=0.5) #Recall this [:frame] notion means we plot the array from xyzs[0] to xyzs[frame]
+            ax.legend()
             ax.set_xlabel("X Axis")
             ax.set_ylabel("Y Axis")
             ax.set_zlabel("Z Axis")
             ax.set_title("Lorenz Attractor")
-
-            plt.savefig('./Images for simulation/graph'+str(frame)+'.png')
+            
+            
+            plt.savefig('./Images for simulation/graph'+str(frame)+'.png', dpi=600) # dpi argument increases resolution
             plt.close('all')
 
             frame = frame + 1
