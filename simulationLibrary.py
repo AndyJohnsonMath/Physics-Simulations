@@ -166,12 +166,12 @@ def lorenz(xyz, s=10, r=28, b=2.667):
 
 # lorenzAttractorImage() produces an image of a Lorenz Attractor System after 'length' amount of iterations. Also takes system parameters s, r, and b. Default value is just a known value that gives a known result to use as sanity checks
 # 'save' parameter allows you to save the image incase you find something cool
-def lorenzAttractorImage(length, s=10, r=28, b=2.667, save=False, clean=False):
+def lorenzAttractorImage(length, s=10, r=28, b=2.667, save=False, clean=False, initPos=np.array([0,1,1.05])):
     dt = 0.01
     num_steps = length
 
     xyzs = np.empty((num_steps + 1, 3))  # Need one more for the initial values
-    xyzs[0] = (0., 1., 1.05)  # Set initial values
+    xyzs[0] = initPos  # Set initial values
     # Step through "time", calculating the partial derivatives at the current point
     # and using them to estimate the next point
     for i in range(num_steps):
@@ -184,17 +184,20 @@ def lorenzAttractorImage(length, s=10, r=28, b=2.667, save=False, clean=False):
     ax.set_xlabel("X Axis")
     ax.set_ylabel("Y Axis")
     ax.set_zlabel("Z Axis")
-    ax.set_title("Lorenz Attractor")
+    ax.text2D(0.05, 0.95, r"$\sigma$="+str("{:.2f}".format(s)), transform=ax.transAxes)
+    ax.text2D(0.05, 1.0, r"$\rho$="+str("{:.2f}".format(r)), transform=ax.transAxes)
+    ax.text2D(0.05, 1.05, r"$\beta$="+str("{:.2f}".format(b)), transform=ax.transAxes)
+    ax.text2D(0.75, 0.95, r"$x$="+str("{:.3f}".format(xyzs[0][0])), transform=ax.transAxes)
+    ax.text2D(0.75, 1.0, r"$y$="+str("{:.2f}".format(xyzs[0][1])), transform=ax.transAxes)
+    ax.text2D(0.75, 1.05, r"$z$="+str("{:.2f}".format(xyzs[0][2])), transform=ax.transAxes)
+    plt.xlim((-25,25))
+    plt.ylim((-30,35))
     if clean == True:
         ax.grid(None)
         ax.axis('off')
     else:
+        ax.set_title("Lorenz Attractor")
         pass
-    
-    #Add labels for the system parameters. the {:.2f}.format() allows us to print the first two decimal points of a floating point number
-    ax.text2D(0.05, 0.95, r"$\sigma$="+str("{:.3f}".format(s)), transform=ax.transAxes)
-    ax.text2D(0.05, 1.0, r"$\rho$="+str("{:.2f}".format(r)), transform=ax.transAxes)
-    ax.text2D(0.05, 1.05, r"$\beta$="+str("{:.2f}".format(b)), transform=ax.transAxes)
     
     if save == True:
         plt.savefig('./Images for simulation/graph'+str(j)+'.png', dpi=300)
