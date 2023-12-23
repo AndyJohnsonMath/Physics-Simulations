@@ -5,9 +5,22 @@ import os
 
 ################################################ Quality of Life #############################################################################################################################################
 
-# clearDirectory() just clearned the "Images for simulation" directory so that we can save over it without any overlap.
 # Default argument is for the 'Images for Simulation' directory since thats where we do most of our work but incase we need to change it we can put in whatever
 def clearDirectory(direc='./Images for simulation'):
+    """
+    Description
+    -----------
+    Deletes the contents of a target directory
+
+    Parameters
+    ----------
+    direc : string
+       string containing the path to your target directory. Default is the essential 'Images for Simulation' library since thats what we use the most, but you can put in whatever you want
+
+    Returns
+    -------
+    Nothing. But! This function does delete the contents of another folder.
+    """
     dir = direc
     for f in os.listdir(dir):
         os.remove(os.path.join(dir, f))
@@ -17,6 +30,27 @@ def clearDirectory(direc='./Images for simulation'):
 # eulersMethod(): Generalized Function that takes in the stepsize, initial conditions and said function from previous cell and returns
 # a 2d array where the first entry is the array of x-values and the second entry is the array of approximated y-values
 def eulersMethod(function, stepSize, initialPair, intervalLength):
+    """
+    Description
+    -----------
+    eulersMethod()is a generalized Function that takes in the stepsize, initial conditions and said function from the ODE and returns a 2d array where the first entry is the array of x-values and the second entry is the array of approximated y-values
+
+    Parameters
+    ----------
+    function : array-like, shape (2,)
+        Numerical array for the function on the right side of the first order ODE set up for this method (Look it up, itll make more sense)
+    stepSize : float
+        Parameter defining the step size of the algorithm
+    initialPair : array-like, shape (1,2)
+        Starting point for the iterative scheme
+    intervalLength : flow
+        Length of the interval from the initialPair[] array to the right. 
+
+    Returns
+    -------
+    solution : array-like, shape (2,len(function))
+        Approximated solution array found using Euler's method. Each element is a coordinate pair, thus the 2D array
+    """
     y0=initialPair[1]
     x0=initialPair[0]
     deltat=stepSize
@@ -179,9 +213,24 @@ def calculateGravity(obj1,obj2):
     F12 = ((G*obj1.mass*obj2.mass)/pow(np.linalg.norm(obj2.position-obj1.position),2))*F12Hat
     return(F12)
 
-# update() takes in a list of PointMassBody() objects, along with a time interval, and updates the gravitational system by one step. Does not return anythin
-# Big problem with this function is that its brute force and is the least computationally efficient way for doing this, but hey its a start
 def update(objects,dt=1/30):
+    """
+    Description
+    -----------
+    update() takes in a list of PointMassBody() objects, along with a time interval, and updates the gravitational system by one step. Does not return anythin
+    Big problem with this function is that its brute force and is the least computationally efficient way for doing this, but hey its a start
+
+    Parameters
+    ----------
+    objects : array-like, shape (1,)
+       Numpy array of PointMassBody() class objects.
+    dt : float
+       Parameters defining the update step size.
+
+    Returns
+    -------
+    Nothing. But! This function does update the member variables of the given array of objects. This is useful for running multiple updates. Specifically useful in the next function, gravitySimulation().
+    """
 # Initialize a force matrix, populate it with the forces of the corresponding index. So, at poition (i,j) is Fij
     forceMatrix=np.zeros((len(objects),len(objects),2))
     for j in range(len(objects)):
@@ -204,6 +253,66 @@ def update(objects,dt=1/30):
         objects[i].acceleration = acceleration[i]
         objects[i].velocity = objects[i].velocity+(objects[i].acceleration*dt)
         objects[i].position = objects[i].position+(objects[i].velocity*dt)
+
+def gravitySimulation(numFrames=500,kind='random',clean=True):
+    """
+    Description
+    -----------
+    Runs an entire gravity simulation by generating frames and saving them to the essential 'Images for Simulation' folder. 
+
+    Parameters
+    ----------
+    numframes : int
+       Length of simulation. Default is 500
+    kind : string
+       Parameter that determines the kind of gravity simultion.
+       Current support for:
+           -'random': A random selection of point masses selected Gaussianly. Default Value
+           -'polygonal': symmetrically distributed identical point masses. Must be hardcoded in
+    clean : Boolean True or False
+        clean True gives
+
+    Returns
+    -------
+    Nothing. But! This function does fill your 'Images for Simulation' folder that is essential for this function to work.
+    Its these images that you run the ffmpeg command on
+    """
+    #The path below should be the path that YOU are saving every frame to. I didnt want to provide my personal one, so unfortunately this is the one thing you will have to do yourself
+    dir = './Images for simulation'
+
+    for f in os.listdir(dir):
+        os.remove(os.path.join(dir, f))
+
+    # Chose the kind of simulation you want, current support for:
+    # Random
+    if kind=='polygonal':
+        b1 = PointMassBody(1*10**12.5,np.array([3,0]),np.array([0,3]),np.array([0,0]))
+        b2 = PointMassBody(1*10**12.5,np.array([0,3]),np.array([-3,0]),np.array([0,0]))
+        b3 = PointMassBody(1*10**12.5,np.array([-3,0]),np.array([0,-3]),np.array([0,0]))
+        b4 = PointMassBody(1*10**12.5,np.array([0,-3]),np.array([3,0]),np.array([0,0]))
+        bodies=np.array([b1,b2,b3,b4])
+    else:
+        bodies = generateParticles(50)
+
+    # Calculate the force between each every body and every other body
+    #Start the main loop
+    for i in range(numFrames):
+        figure, axes = plt.subplots()
+        update(bodies,dt=1/120)
+
+        for j in range(len(bodies)):
+            axes.scatter(bodies[j].position[0], bodies[j].position[1])
+
+        if clean == True:
+            plt.grid()
+        else:
+            pass
+        axes.set_aspect(1)
+        plt.xlim(-10,10)
+        plt.ylim(-10,10)
+
+        figure.savefig('./Images for simulation/graph'+str(i)+'.png')
+        plt.close('all')
 
 
 ###################################################### Lorenz Attractor Stuff ########################################################################################################
