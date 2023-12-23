@@ -140,6 +140,36 @@ class PointMassBody:
         self.velocity = velocity
         self.acceleration = acceleration
 
+# randParticleGravity() just generates a random particle ~10^12kg in mass
+def randParticleGravity():
+    #Declare randomly assigned mass
+    mass = np.random.normal(loc=1*10**12,scale=100000000000)
+    
+    #Declare randomly assigned positions and make sure it doesnt go out of bounds
+    posx = np.random.normal(scale=5)
+    posy = np.random.normal(scale=5)
+    if posx >= 30:
+        posx = 30
+    if posy >= 30:
+        posy = 30
+    position = np.array([posx,posy])
+    
+    #Declare randomly assigned positions and make sure it doesnt go out of bounds
+    velx = np.random.normal(scale=0.5)
+    vely = np.random.normal(scale=0.5)
+    velocity = np.array([velx,vely])
+
+    #Generate and return the particle
+    particle = PointMassBody(mass,position,velocity,np.array([0,0]))
+    return(particle)
+
+# generateParticles() takes in an integer argument and generates an array of random particles generated from randParticleGravity()
+def generateParticles(num):
+    pointMassArray=np.zeros(num,dtype='object')
+    for i in range(len(pointMassArray)):
+        pointMassArray[i]=randParticleGravity()
+    return(pointMassArray)
+
 
 ###################################################### Lorenz Attractor Stuff ########################################################################################################
 
