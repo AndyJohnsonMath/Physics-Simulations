@@ -169,14 +169,41 @@ def rkf45(function, initialStepSize, initialPair, intervalLength, minStepSize, m
 # PointMassBody() is the class for point masses
 # position, velocity and acceleration should all be 1x2 arrays
 class PointMassBody:
+    """
+    Description
+    -----------
+    Class defining gravitational point masses.
+
+    Parameters
+    ----------
+    mass : float
+        Mass of object in kg
+    position: array-like, shape (1,2)
+        2D velocity array with x and y components
+    acceleration: array-like, shape (1,2)
+        2D acceleration array with x and y components
+    """
     def __init__(self,mass,position,velocity,acceleration):
         self.mass = mass
         self.position = position
         self.velocity = velocity
         self.acceleration = acceleration
 
-# randParticleGravity() just generates a random particle ~10^12kg in mass
 def randParticleGravity():
+    """
+    Description
+    -----------
+    randParticleGravity() just generates a random particle ~10^12kg in mass.
+
+    Parameters
+    ----------
+    None.
+
+    Returns
+    -------
+    particle : PointMassBody() object, dtype='object'
+        Returns a PointMassBody() object.
+    """
     #Declare randomly assigned mass
     mass = np.random.normal(loc=1*10**12,scale=100000000000)
     
@@ -200,14 +227,43 @@ def randParticleGravity():
 
 # generateParticles() takes in an integer argument and generates an array of random particles generated from randParticleGravity()
 def generateParticles(num):
+    """
+    Description
+    -----------
+    generateParticles() takes in an integer argument and generates an array of random particles generated from randParticleGravity().
+
+    Parameters
+    ----------
+    num : int
+       Parameter defining the number of particles generated.
+
+    Returns
+    -------
+    pointMassArray : array-like, shape (1,), dtype='object'
+        An array of PointMassBody() objects.
+    """
     pointMassArray=np.zeros(num,dtype='object')
     for i in range(len(pointMassArray)):
         pointMassArray[i]=randParticleGravity()
     return(pointMassArray)
 
-# calculateGravity() calculates the gravitational force vector between two objects from the PointMassBody() class
-# Takes in two objects, returns a 1x2 force vector
 def calculateGravity(obj1,obj2):
+    """
+    Description
+    -----------
+    calculateGravity() calculates the gravitational force vector between two objects from the PointMassBody() class
+    Takes in two objects, returns a 1x2 force vector
+
+    Parameters
+    ----------
+    obj1, obj2 : PointMassBody() objects
+       The two gravitational bodies that we want to calculate the force between.
+
+    Returns
+    -------
+    F12 : array-like, shape(1,2)
+       Returns a 2D force vector with x and y components
+    """
     G = 6.674*pow(10,-11)
     F12Hat = (obj2.position-obj1.position)/np.linalg.norm(obj2.position-obj1.position)
     F12 = ((G*obj1.mass*obj2.mass)/pow(np.linalg.norm(obj2.position-obj1.position),2))*F12Hat
