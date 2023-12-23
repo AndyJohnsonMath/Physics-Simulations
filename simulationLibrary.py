@@ -133,6 +133,7 @@ def rkf45(function, initialStepSize, initialPair, intervalLength, minStepSize, m
 
 
 # PointMassBody() is the class for point masses
+# position, velocity and acceleration should all be 1x2 arrays
 class PointMassBody:
     def __init__(self,mass,position,velocity,acceleration):
         self.mass = mass
@@ -155,8 +156,8 @@ def randParticleGravity():
     position = np.array([posx,posy])
     
     #Declare randomly assigned positions and make sure it doesnt go out of bounds
-    velx = np.random.normal(scale=0.5)
-    vely = np.random.normal(scale=0.5)
+    velx = np.random.normal(scale=0.2)
+    vely = np.random.normal(scale=0.2)
     velocity = np.array([velx,vely])
 
     #Generate and return the particle
@@ -169,6 +170,40 @@ def generateParticles(num):
     for i in range(len(pointMassArray)):
         pointMassArray[i]=randParticleGravity()
     return(pointMassArray)
+
+# calculateGravity() calculates the gravitational force vector between two objects from the PointMassBody() class
+# Takes in two objects, returns a 1x2 force vector
+def calculateGravity(obj1,obj2):
+    G = 6.674*pow(10,-11)
+    F12Hat = (obj2.position-obj1.position)/np.linalg.norm(obj2.position-obj1.position)
+    F12 = ((G*obj1.mass*obj2.mass)/pow(np.linalg.norm(obj2.position-obj1.position),2))*F12Hat
+    return(F12)
+
+# update() takes in a list of PointMassBody() objects, along with a time interval, and updates the gravitational system by one step. Does not return anythin
+# Big problem with this function is that its brute force and is the least computationally efficient way for doing this, but hey its a start
+def update(objects,dt=1/30):
+# Initialize a force matrix, populate it with the forces of the corresponding index. So, at poition (i,j) is Fij
+    forceMatrix=np.zeros((len(objects),len(objects),2))
+    for j in range(len(objects)):
+        for i in range(len(objects)):
+            if i == j:
+                forceMatrix[i][j]=0 #Force between an object and itself is zero, so Fij = 0 iff i == j
+            else:
+                forceMatrix[i][j]=calculateGravity(objects[i],objects[j])
+    
+    # Initialize these arrays
+    totForceArray = np.zeros((len(objects),2))
+    acceleration = np.zeros((len(objects),2))
+    # Iterate over every object
+    for i in range(len(objects)):
+        # Calculate total forces so that we can then find net acceleration for a single object
+        totForceArray[i]=forceMatrix[i].sum(axis=0)
+        acceleration[i]=(1/objects[i].mass)*totForceArray[i]
+        
+        #Actually update the object information
+        objects[i].acceleration = acceleration[i]
+        objects[i].velocity = objects[i].velocity+(objects[i].acceleration*dt)
+        objects[i].position = objects[i].position+(objects[i].velocity*dt)
 
 
 ###################################################### Lorenz Attractor Stuff ########################################################################################################
