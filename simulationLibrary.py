@@ -37,7 +37,7 @@ def eulersMethod(function, stepSize, initialPair, intervalLength):
 
     Parameters
     ----------
-    function : array-like, shape (2,)
+    function : function (?, not sure if this is a valid data type, but this parameter is a function)
         Numerical array for the function on the right side of the first order ODE set up for this method (Look it up, itll make more sense)
     stepSize : float
         Parameter defining the step size of the algorithm
@@ -75,6 +75,27 @@ def eulersMethod(function, stepSize, initialPair, intervalLength):
 
 # rungeKutta(): Function set up exactly the same as eulersMethod(), just runs the Runge-Kutta algorithm instead
 def rungeKutta(function, stepSize, initialPair, intervalLength):
+    """
+    Description
+    -----------
+    Performs the Runge-Kutta method for numerically solving ODEs
+
+    Parameters
+    ----------
+    function : function (?, not sure if this is a valid data type, but this parameter is a function)
+       string containing the path to your target directory. Default is the essential 'Images for Simulation' library since thats what we use the most, but you can put in whatever you want
+    stepSize : float
+        Parameter defining the step size of the algorithm
+    initialPair : array-like, shape (1,2)
+        Starting point for the iterative scheme
+    intervalLength : flow
+        Length of the interval from the initialPair[] array to the right. 
+
+    Returns
+    -------
+    solution : array-like, shape (2,len(function))
+        Approximated solution array found using the Runge-Kutta method. Each element is a coordinate pair, thus the 2D array
+    """
     y0=initialPair[1]
     x0=initialPair[0]
     
