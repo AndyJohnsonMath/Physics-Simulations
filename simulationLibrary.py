@@ -5,17 +5,16 @@ import os
 
 ################################################ Quality of Life #############################################################################################################################################
 
-# Default argument is for the 'Images for Simulation' directory since thats where we do most of our work but incase we need to change it we can put in whatever
 def clearDirectory(direc='./Images for simulation'):
     """
     Description
     -----------
-    Deletes the contents of a target directory
+    Deletes the contents of a target directory.
 
     Parameters
     ----------
     direc : string
-       string containing the path to your target directory. Default is the essential 'Images for Simulation' library since thats what we use the most, but you can put in whatever you want
+       string containing the path to your target directory. Default is the essential 'Images for Simulation' library since thats what we use the most, but you can put in whatever you want.
 
     Returns
     -------
@@ -27,29 +26,28 @@ def clearDirectory(direc='./Images for simulation'):
 
 ################################################ Numerical Methods #########################################################################################################
 
-# eulersMethod(): Generalized Function that takes in the stepsize, initial conditions and said function from previous cell and returns
-# a 2d array where the first entry is the array of x-values and the second entry is the array of approximated y-values
 def eulersMethod(function, stepSize, initialPair, intervalLength):
     """
     Description
     -----------
-    eulersMethod()is a generalized Function that takes in the stepsize, initial conditions and said function from the ODE and returns a 2d array where the first entry is the array of x-values and the second entry is the array of approximated y-values
+    eulersMethod(): Generalized Function that takes in the stepsize, initial conditions and said function from previous cell and returns
+    a 2d array where the first entry is the array of x-values and the second entry is the array of approximated y-values.
 
     Parameters
     ----------
     function : function (?, not sure if this is a valid data type, but this parameter is a function)
-        Numerical array for the function on the right side of the first order ODE set up for this method (Look it up, itll make more sense)
+        Numerical array for the function on the right side of the first order ODE set up for this method (Look it up, itll make more sense).
     stepSize : float
-        Parameter defining the step size of the algorithm
+        Parameter defining the step size of the algorithm.
     initialPair : array-like, shape (1,2)
-        Starting point for the iterative scheme
-    intervalLength : flow
+        Starting point for the iterative scheme.
+    intervalLength : float
         Length of the interval from the initialPair[] array to the right. 
 
     Returns
     -------
     solution : array-like, shape (2,len(function))
-        Approximated solution array found using Euler's method. Each element is a coordinate pair, thus the 2D array
+        Approximated solution array found using Euler's method. Each element is a coordinate pair, thus the 2D array.
     """
     y0=initialPair[1]
     x0=initialPair[0]
@@ -73,28 +71,28 @@ def eulersMethod(function, stepSize, initialPair, intervalLength):
     solution = np.array([solutionx, solutiony])
     return(solution)
 
-# rungeKutta(): Function set up exactly the same as eulersMethod(), just runs the Runge-Kutta algorithm instead
+
 def rungeKutta(function, stepSize, initialPair, intervalLength):
     """
     Description
     -----------
-    Performs the Runge-Kutta method for numerically solving ODEs
+    rungeKutta(): Function set up exactly the same as eulersMethod(), just runs the Runge-Kutta algorithm instead
 
     Parameters
     ----------
     function : function (?, not sure if this is a valid data type, but this parameter is a function)
-       string containing the path to your target directory. Default is the essential 'Images for Simulation' library since thats what we use the most, but you can put in whatever you want
+        string containing the path to your target directory. Default is the essential 'Images for Simulation' library since thats what we use the most, but you can put in whatever you want.
     stepSize : float
-        Parameter defining the step size of the algorithm
+        Parameter defining the step size of the algorithm.
     initialPair : array-like, shape (1,2)
-        Starting point for the iterative scheme
-    intervalLength : flow
+        Starting point for the iterative scheme.
+    intervalLength : float
         Length of the interval from the initialPair[] array to the right. 
 
     Returns
     -------
     solution : array-like, shape (2,len(function))
-        Approximated solution array found using the Runge-Kutta method. Each element is a coordinate pair, thus the 2D array
+        Approximated solution array found using the Runge-Kutta method. Each element is a coordinate pair, thus the 2D array.
     """
     y0=initialPair[1]
     x0=initialPair[0]
@@ -122,11 +120,38 @@ def rungeKutta(function, stepSize, initialPair, intervalLength):
     solution = np.array([solutionx, solutiony])
     return(solution)
 
-# rkf45(): This function runs the Runge-Kutta-Fehlberg fourth-order-fifth-order scheme
-# You might notice this function takes significantly more function arguments than the previous function, that is just a result of this function being more intense in general
-# Takes in a function f(x,y), initial step size you want to work with (if the step size is too big this algorithm will correct it), initialPair which is a numpy array with the initial values for the IVP
-# minStepSize and maxStepSize are the bounds for the variable step size and TOL is the user-defined tolerance measuring the maximum amount of error allowed in solving. In testing, TOL=5*10^-7
+
 def rkf45(function, initialStepSize, initialPair, intervalLength, minStepSize, maxStepSize, TOL):
+    """
+    Description
+    -----------
+    rkf45(): This function runs the Runge-Kutta-Fehlberg fourth-order-fifth-order scheme.
+    You might notice this function takes significantly more function arguments than the previous function, that is just a result of this function being more intense in general.
+    Takes in a function f(x,y), initial step size you want to work with (if the step size is too big this algorithm will correct it), initialPair which is a numpy array with the initial values for the IVP.
+    minStepSize and maxStepSize are the bounds for the variable step size and TOL is the user-defined tolerance measuring the maximum amount of error allowed in solving. In testing, TOL=5*10^-7.
+
+    Parameters
+    ----------
+    function : function (?, not sure if this is a valid data type, but this parameter is a function)
+       string containing the path to your target directory. Default is the essential 'Images for Simulation' library since thats what we use the most, but you can put in whatever you want.
+    initialStepSize : float
+        Parameter defining the initial step size of the algorithm.
+    initialPair : array-like, shape (1,2)
+        Starting point for the iterative scheme.
+    intervalLength : float
+        Length of the interval from the initialPair[] array to the right.
+    minStepSize : float
+        Minimum stepsize the algorithm will use if needed.
+    maxStepSize : float
+        Maximum stepsize the algorithm will use if needed.
+    TOL : float
+        Tolerance measuring the maximum amount of error allowed in solving.
+
+    Returns
+    -------
+    solution : array-like, shape (2,len(function))
+        Approximated solution array found using the Runge-Kutta method. Each element is a coordinate pair, thus the 2D array
+    """
     #Classic initialization, since this method has a variable step-size it makes more sense to iterate over the length of the interval rather than the number of steps
     totalLengthComputed = 0
     stepSize = initialStepSize
@@ -198,11 +223,11 @@ class PointMassBody:
     Parameters
     ----------
     mass : float
-        Mass of object in kg
+        Mass of object in kg.
     position: array-like, shape (1,2)
-        2D velocity array with x and y components
+        2D velocity array with x and y components.
     acceleration: array-like, shape (1,2)
-        2D acceleration array with x and y components
+        2D acceleration array with x and y components.
     """
     def __init__(self,mass,position,velocity,acceleration):
         self.mass = mass
@@ -272,8 +297,8 @@ def calculateGravity(obj1,obj2):
     """
     Description
     -----------
-    calculateGravity() calculates the gravitational force vector between two objects from the PointMassBody() class
-    Takes in two objects, returns a 1x2 force vector
+    calculateGravity() calculates the gravitational force vector between two objects from the PointMassBody() class.
+    Takes in two objects, returns a 1x2 force vector.
 
     Parameters
     ----------
@@ -283,7 +308,7 @@ def calculateGravity(obj1,obj2):
     Returns
     -------
     F12 : array-like, shape(1,2)
-       Returns a 2D force vector with x and y components
+       Returns a 2D force vector with x and y components.
     """
     G = 6.674*pow(10,-11)
     F12Hat = (obj2.position-obj1.position)/np.linalg.norm(obj2.position-obj1.position)
@@ -294,8 +319,8 @@ def update(objects,dt=1/30):
     """
     Description
     -----------
-    update() takes in a list of PointMassBody() objects, along with a time interval, and updates the gravitational system by one step. Does not return anythin
-    Big problem with this function is that its brute force and is the least computationally efficient way for doing this, but hey its a start
+    update() takes in a list of PointMassBody() objects, along with a time interval, and updates the gravitational system by one step. Does not return anything.
+    Big problem with this function is that its brute force and is the least computationally efficient way for doing this, but hey its a start.
 
     Parameters
     ----------
@@ -331,7 +356,7 @@ def update(objects,dt=1/30):
         objects[i].velocity = objects[i].velocity+(objects[i].acceleration*dt)
         objects[i].position = objects[i].position+(objects[i].velocity*dt)
 
-def gravitySimulation(numFrames=500,kind='random',clean=True):
+def gravitySimulation(numParticles = 10, kind='random', numFrames=500,clean=True):
     """
     Description
     -----------
@@ -339,13 +364,15 @@ def gravitySimulation(numFrames=500,kind='random',clean=True):
 
     Parameters
     ----------
-    numframes : int
-       Length of simulation. Default is 500
+    numParticles : int
+        Number of particles in the simulation. Default is 10 point mass bodies.
     kind : string
        Parameter that determines the kind of gravity simultion.
        Current support for:
            -'random': A random selection of point masses selected Gaussianly. Default Value
            -'polygonal': symmetrically distributed identical point masses. Must be hardcoded in
+    numframes : int
+       Length of simulation. Default is 500.
     clean : Boolean True or False
         clean True gives
 
@@ -369,7 +396,7 @@ def gravitySimulation(numFrames=500,kind='random',clean=True):
         b4 = PointMassBody(1*10**12.5,np.array([0,-3]),np.array([3,0]),np.array([0,0]))
         bodies=np.array([b1,b2,b3,b4])
     else:
-        bodies = generateParticles(50)
+        bodies = generateParticles(numParticles)
 
     # Calculate the force between each every body and every other body
     #Start the main loop
@@ -397,6 +424,10 @@ def gravitySimulation(numFrames=500,kind='random',clean=True):
 # Not my own code, got it from DrM at https://matplotlib.org/stable/gallery/mplot3d/lorenz_attractor.html     
 def lorenz(xyz, s=10, r=28, b=2.667):
     """
+    Description
+    -----------
+    Computes the next step in the Lorenz attractor system.
+
     Parameters
     ----------
     xyz : array-like, shape (3,)
@@ -404,7 +435,7 @@ def lorenz(xyz, s=10, r=28, b=2.667):
     s, r, b : float
        Parameters defining the Lorenz attractor.
 
-    Returns
+    Returns 
     -------
     xyz_dot : array, shape (3,)
        Values of the Lorenz attractor's partial derivatives at *xyz*.
@@ -418,6 +449,28 @@ def lorenz(xyz, s=10, r=28, b=2.667):
 # lorenzAttractorImage() produces an image of a Lorenz Attractor System after 'length' amount of iterations. Also takes system parameters s, r, and b. Default value is just a known value that gives a known result to use as sanity checks
 # 'save' parameter allows you to save the image incase you find something cool
 def lorenzAttractorImage(length, s=10, r=28, b=2.667, save=False, clean=False, initPos=np.array([0,1,1.05])):
+    """
+    Description
+    -----------
+    lorenzAttractorImage() produces an image of a Lorenz Attractor System after 'length' amount of iterations. Also takes system parameters s, r, and b. Default value is just a known value that gives a known result to use as sanity checks.
+
+    Parameters
+    ----------
+    length : int
+       Number of steps in the path traversed through the Lorenz attractor.
+    s, r, b : float
+       Parameters defining the Lorenz attractor. Default values are just known good values for the system.
+    save : Boolean True of False
+        If True, image will be saved to the "Images for Simulation" library, else it wont be saved. Default is False.
+    clean : Boolean True or False
+        If True all the axes will be removed from the graph showing just the path. Else it will be a default plot. Default is False.
+    initPos : array-like, shape (1,3)
+        Initial position of the system. Default value is just a known good starting position.
+
+    Returns 
+    -------
+    Nothing. But! It generates an image of the Lorenz Attractor for you to see.
+    """
     dt = 0.01
     num_steps = length
 
@@ -460,6 +513,28 @@ def lorenzAttractorImage(length, s=10, r=28, b=2.667, save=False, clean=False, i
 # Will save images to target directory where you will then have to run ffmpeg through the command line to use. Ffmpeg comand is given in the next line
 # ffmpeg -start_number 0 -framerate 60 -i graph%01d.png video.webm
 def lorenzAttractorTrace(frames, s=10, r=28, b=2.667, clean=False, rotation=False):
+    """
+    Description
+    -----------
+    lorenzAttractorTrace() takes in the amount of frames you want to video to be along with the system paramters s, r and b. Default value is just a known value that gives a known result to use as sanity checks
+    Will save images to target directory where you will then have to run ffmpeg through the command line to use. Ffmpeg comand is given in the next line
+    ffmpeg -start_number 0 -framerate 60 -i graph%01d.png video.webm
+
+    Parameters
+    ----------
+    frames : int
+       Number of frames in the simulation.
+    s, r, b : float
+       Parameters defining the Lorenz attractor. Default values are just known good values for the system.
+    clean : Boolean True or False
+        If True all the axes will be removed from the graph showing just the path. Else it will be a default plot. Default is False.
+    rotation : Boolean True or False
+        If true the simulation will revolve continuously
+
+    Returns 
+    -------
+    Nothing. But! It will generate frames in the "Images for Simulation" folder for you to compile with the ffmpeg command in the Description.
+    """
     #Empty the target directory
     clearDirectory()
 
