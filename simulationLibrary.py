@@ -448,7 +448,7 @@ def lorenz(xyz, s=10, r=28, b=2.667):
 
 # lorenzAttractorImage() produces an image of a Lorenz Attractor System after 'length' amount of iterations. Also takes system parameters s, r, and b. Default value is just a known value that gives a known result to use as sanity checks
 # 'save' parameter allows you to save the image incase you find something cool
-def lorenzAttractorImage(length, s=10, r=28, b=2.667, save=False, clean=False, initPos=np.array([0,1,1.05])):
+def lorenzAttractorImage(length, s=10, r=28, b=2.667, save=False, clean=False, initPos=np.array([0,1,1.05]), *args):
     """
     Description
     -----------
@@ -504,7 +504,7 @@ def lorenzAttractorImage(length, s=10, r=28, b=2.667, save=False, clean=False, i
         pass
     
     if save == True:
-        plt.savefig('./Images for simulation/graph'+str(j)+'.png', dpi=300)
+        plt.savefig('./Images for simulation/graph'+str(args)+'.png', dpi=300)
         plt.close('all')
     else:
         plt.show()
