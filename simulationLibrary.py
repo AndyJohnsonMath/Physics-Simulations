@@ -386,15 +386,13 @@ def gravitySimulation(numParticles = 10, kind='random', numFrames=500,clean=True
 
     for f in os.listdir(dir):
         os.remove(os.path.join(dir, f))
-
-    # Chose the kind of simulation you want, current support for:
-    # Random
+        
     if kind=='polygonal':
-        b1 = PointMassBody(1*10**12.5,np.array([3,0]),np.array([0,3]),np.array([0,0]))
-        b2 = PointMassBody(1*10**12.5,np.array([0,3]),np.array([-3,0]),np.array([0,0]))
-        b3 = PointMassBody(1*10**12.5,np.array([-3,0]),np.array([0,-3]),np.array([0,0]))
-        b4 = PointMassBody(1*10**12.5,np.array([0,-3]),np.array([3,0]),np.array([0,0]))
-        bodies=np.array([b1,b2,b3,b4])
+        bodies = np.zeros(numParticles,dtype='object')
+        for i in range(numParticles):
+            bodies[i]=PointMassBody(1*10**12.5,np.array([0,0]),np.array([0,0]),np.array([0,0]))
+            bodies[i].position=np.array([6*np.cos((2*np.pi/numParticles)*i),6*np.sin((2*np.pi/numParticles)*i)])
+            bodies[i].velocity=np.array([6*(-1)*np.sin((2*np.pi/numParticles)*i),6*np.cos((2*np.pi/numParticles)*i)])
     else:
         bodies = generateParticles(numParticles)
 
@@ -408,14 +406,15 @@ def gravitySimulation(numParticles = 10, kind='random', numFrames=500,clean=True
             axes.scatter(bodies[j].position[0], bodies[j].position[1])
 
         if clean == True:
-            plt.grid()
+            plt.grid(None)
+            plt.axis('off')
         else:
             pass
         axes.set_aspect(1)
         plt.xlim(-10,10)
         plt.ylim(-10,10)
 
-        figure.savefig('./Images for simulation/graph'+str(i)+'.png')
+        figure.savefig('./Images for simulation/graph'+str(i)+'.png', dpi=300)
         plt.close('all')
 
 
