@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import os
+import time
 
 ################################################ Quality of Life #############################################################################################################################################
 
@@ -254,12 +255,12 @@ def randParticleGravity():
     mass = np.random.normal(loc=1*10**12,scale=100000000000)
     
     #Declare randomly assigned positions and make sure it doesnt go out of bounds
-    posx = np.random.normal(scale=5)
-    posy = np.random.normal(scale=5)
-    if posx >= 30:
-        posx = 30
-    if posy >= 30:
-        posy = 30
+    posx = np.random.normal(scale=15)
+    posy = np.random.normal(scale=15)
+    if posx >= 80:
+        posx = 80
+    if posy >= 80:
+        posy = 80
     position = np.array([posx,posy])
     
     #Declare randomly assigned positions and make sure it doesnt go out of bounds
@@ -403,7 +404,7 @@ def gravitySimulation(numParticles = 10, kind='random', numFrames=500,clean=True
         update(bodies,dt=1/120)
 
         for j in range(len(bodies)):
-            axes.scatter(bodies[j].position[0], bodies[j].position[1])
+            axes.scatter(bodies[j].position[0], bodies[j].position[1], s=1)
 
         if clean == True:
             plt.grid(None)
@@ -411,8 +412,8 @@ def gravitySimulation(numParticles = 10, kind='random', numFrames=500,clean=True
         else:
             pass
         axes.set_aspect(1)
-        plt.xlim(-10,10)
-        plt.ylim(-10,10)
+        plt.xlim(-100,100)
+        plt.ylim(-100,100)
 
         figure.savefig('./Images for simulation/graph'+str(i)+'.png', dpi=300)
         plt.close('all')
