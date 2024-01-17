@@ -210,7 +210,7 @@ def rkf45(function, initialStepSize, initialPair, intervalLength, minStepSize, m
     solution = np.array([solutionx, solutiony])
     return(solution)
 
-###################################################### gravity stuff ########################################################################################################
+###################################################### gravity stuff #######################################################################################################################################################################
 
 
 # PointMassBody() is the class for point masses
@@ -357,7 +357,7 @@ def update(objects,dt=1/30):
         objects[i].velocity = objects[i].velocity+(objects[i].acceleration*dt)
         objects[i].position = objects[i].position+(objects[i].velocity*dt)
 
-def gravitySimulation(numParticles = 10, kind='random', numFrames=500,clean=True):
+def gravitySimulation(kind='random', numParticles = 10, bod=np.array([0],dtype='object'), numFrames=500, clean=True):
     """
     Description
     -----------
@@ -365,17 +365,20 @@ def gravitySimulation(numParticles = 10, kind='random', numFrames=500,clean=True
 
     Parameters
     ----------
-    numParticles : int
-        Number of particles in the simulation. Default is 10 point mass bodies.
     kind : string
        Parameter that determines the kind of gravity simultion.
        Current support for:
            -'random': A random selection of point masses selected Gaussianly. Default Value
            -'polygonal': symmetrically distributed identical point masses. Must be hardcoded in
+           -'custom': Input a custom 'bodies' object array under the 'bod' argument.
+    numParticles : int
+        Number of particles in the simulation. Default is 10 point mass bodies.
+    bod : Array-like, shape (1,)
+        Numpy array of data type 'object' that has PointMassBody objects as each entry. Default is np.array([0],dtype='object') just as a dummy object meant to be written over.
     numframes : int
        Length of simulation. Default is 500.
     clean : Boolean True or False
-        clean True gives
+        True plots the bodies with no gridlines or axes, false plots the bodies with gridlines and axes.
 
     Returns
     -------
@@ -387,8 +390,12 @@ def gravitySimulation(numParticles = 10, kind='random', numFrames=500,clean=True
 
     for f in os.listdir(dir):
         os.remove(os.path.join(dir, f))
-        
-    if kind=='polygonal':
+    
+    # This block checks the kind of simulation you want to do
+    # Ultimately these conditional statements just determine what the 'bodies' variable is set to. Then 'bodies' gets passed to the update function
+    if kind == 'custom':
+        bodies = bod
+    elif kind=='polygonal':
         bodies = np.zeros(numParticles,dtype='object')
         for i in range(numParticles):
             bodies[i]=PointMassBody(1*10**12.5,np.array([0,0]),np.array([0,0]),np.array([0,0]))
@@ -419,7 +426,7 @@ def gravitySimulation(numParticles = 10, kind='random', numFrames=500,clean=True
         plt.close('all')
 
 
-###################################################### Lorenz Attractor Stuff ########################################################################################################
+###################################################### Lorenz Attractor Stuff ################################################################################################################################################
 
 # Not my own code, got it from DrM at https://matplotlib.org/stable/gallery/mplot3d/lorenz_attractor.html     
 def lorenz(xyz, s=10, r=28, b=2.667):
