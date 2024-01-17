@@ -236,7 +236,7 @@ class PointMassBody:
         self.velocity = velocity
         self.acceleration = acceleration
 
-def randParticleGravity():
+def randParticleGravity(massMean=1*10**12, massStdDev=100000000000, posStdDev = 15, velStdDev = 0.2):
     """
     Description
     -----------
@@ -244,19 +244,26 @@ def randParticleGravity():
 
     Parameters
     ----------
-    None.
+    massMean : float
+        mean of the randomly decided mass. Default argument arbitrarily chosen.
+    massStdDev : float
+        standard deviation mass of the randomly decided mass. Default argument arbitrarily chosen.
+    posStdDev : float
+        standard deviation mass of the randomly decided position. Default argument arbitrarily chosen.
+    velStdDev : float
+        standard deviation mass of the randomly decided velocity. Default argument arbitrarily chosen.
 
     Returns
     -------
     particle : PointMassBody() object, dtype='object'
-        Returns a PointMassBody() object.
+        Returns a PointMassBody() object with randomly decided mass, position and velocity.
     """
     #Declare randomly assigned mass
-    mass = np.random.normal(loc=1*10**12,scale=100000000000)
+    mass = np.random.normal(loc=massMean,scale=massStdDev)
     
     #Declare randomly assigned positions and make sure it doesnt go out of bounds
-    posx = np.random.normal(scale=15)
-    posy = np.random.normal(scale=15)
+    posx = np.random.normal(scale=posStdDev)
+    posy = np.random.normal(scale=posStdDev)
     if posx >= 80:
         posx = 80
     if posy >= 80:
@@ -264,8 +271,8 @@ def randParticleGravity():
     position = np.array([posx,posy])
     
     #Declare randomly assigned positions and make sure it doesnt go out of bounds
-    velx = np.random.normal(scale=0.2)
-    vely = np.random.normal(scale=0.2)
+    velx = np.random.normal(scale=velStdDev)
+    vely = np.random.normal(scale=velStdDev)
     velocity = np.array([velx,vely])
 
     #Generate and return the particle
