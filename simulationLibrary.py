@@ -429,7 +429,7 @@ def gravitySimulation(kind='random', numParticles = 10, bod=np.array([0],dtype='
         plt.xlim(-100,100)
         plt.ylim(-100,100)
 
-        figure.savefig('./Images for simulation/graph'+str(i)+'.png', dpi=300)
+        figure.savefig('./Images for simulation/graph'+str(i)+'.png', bbox_inches='tight', pad_inches=0 ,dpi=300)
         plt.close('all')
 
 
