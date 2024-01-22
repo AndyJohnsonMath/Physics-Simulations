@@ -425,8 +425,8 @@ def gravitySimulation(kind='random', numParticles = 10, bod=np.array([0],dtype='
             plt.axis('off')
         else:
             pass
-        axes.set_aspect(1)
-        plt.xlim(-100,100)
+        axes.set_aspect('auto')
+        plt.xlim(-200,200)
         plt.ylim(-100,100)
 
         figure.savefig('./Images for simulation/graph'+str(i)+'.png', bbox_inches='tight', pad_inches=0 ,dpi=300)
