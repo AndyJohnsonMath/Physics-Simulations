@@ -261,6 +261,12 @@ def randParticle(massMean=1*10**12, massStdDev=100000000000, posMean = 0, posStd
         mean of the randomly decided velocity. Default argument arbitrarily chosen tailored for gravity simulations.
     velStdDev : float
         standard deviation mass of the randomly decided velocity. Default argument arbitrarily chosen tailored for gravity simulations.
+    tpye : string
+       Parameter that determines the kind of particle generated.
+       Current support for:
+           -'gravity': Creates an object of the PointMassBody() class.
+           -default : Creates an object of the Particle() class. 
+
 
     Returns
     -------
@@ -310,7 +316,7 @@ def generateParticles(num):
     """
     pointMassArray=np.zeros(num,dtype='object')
     for i in range(len(pointMassArray)):
-        pointMassArray[i]=randParticleGravity()
+        pointMassArray[i]=randParticle(type='gravity')
     return(pointMassArray)
 
 def calculateGravity(obj1,obj2):
@@ -353,7 +359,7 @@ def update(objects,dt=1/30):
     -------
     Nothing. But! This function does update the member variables of the given array of objects. This is useful for running multiple updates. Specifically useful in the next function, gravitySimulation().
     """
-# Initialize a force matrix, populate it with the forces of the corresponding index. So, at poition (i,j) is Fij
+    # Initialize a force matrix, populate it with the forces of the corresponding index. So, at poition (i,j) is Fij
     forceMatrix=np.zeros((len(objects),len(objects),2))
     for j in range(len(objects)):
         for i in range(len(objects)):
@@ -405,10 +411,7 @@ def gravitySimulation(kind='random', numParticles = 10, bod=np.array([0],dtype='
     Its these images that you run the ffmpeg command on
     """
     #The path below should be the path that YOU are saving every frame to. I didnt want to provide my personal one, so unfortunately this is the one thing you will have to do yourself
-    dir = './Images for simulation'
-
-    for f in os.listdir(dir):
-        os.remove(os.path.join(dir, f))
+    clearDirectory()
     
     # This block checks the kind of simulation you want to do
     # Ultimately these conditional statements just determine what the 'bodies' variable is set to. Then 'bodies' gets passed to the update function
@@ -427,7 +430,7 @@ def gravitySimulation(kind='random', numParticles = 10, bod=np.array([0],dtype='
     #Start the main loop
     for i in range(numFrames):
         figure, axes = plt.subplots()
-        update(bodies,dt=1/30)
+        update(bodies)
 
         for j in range(len(bodies)):
             axes.scatter(bodies[j].position[0], bodies[j].position[1], s=1)
@@ -650,6 +653,23 @@ def lorenzAttractorTrace(frames, s=10, r=28, b=2.667, clean=False, rotation=Fals
 
 #Class defining a particle used in the simulation
 class Particle:
+    """
+    Description
+    -----------
+    A class defining a particle to be used in collision detection. That is, what
+
+    Parameters
+    ----------
+    xyz : array-like, shape (3,)
+       Point of interest in three-dimensional space.
+    s, r, b : float
+       Parameters defining the Lorenz attractor.
+
+    Returns 
+    -------
+    xyz_dot : array, shape (3,)
+       Values of the Lorenz attractor's partial derivatives at *xyz*.
+    """
     def __init__(self, mass, position, velocity, acceleration, box):
         
         self.mass = mass
@@ -740,7 +760,7 @@ def handleParticleCollision(pa,pb):
         pb.position = temp4
         
 #Since this is a discreet colission simulation this function is for updating the state of the simulation
-def update(dt):
+def updateCollision(dt):
     p1.velocity = p1.velocity+(p1.acceleration*dt)
     p1.position = p1.position+(p1.velocity*dt)
     p1.KE = (1/2)*p1.mass*np.dot(p1.velocity,p1.velocity)
