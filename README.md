@@ -8,6 +8,7 @@ Welcome to my repository for physics simulations! I call this repository "Physic
 - **N-Body Problem [Notebook].ipynb** : Jupyter Notbook detailing how to implement the gravity simulation engine.
 - **memoryExperiment.py** : Python file designed to be used in memory profiling via the terminal
 - **simulationLibrary.py** : Python file housing the entire physics engine that all of the jupyter notebooks are dependent on. This contains all generalized functions developed in the notebooks. It is split into parts depending on specific field of physics or numerical analysis that those specific functions match with.
+- **Collision Detection [Notebook].ipynb** : Jupyter notebook documenting our exploration into collision detection simulations and our attempt at creating a homebrew one.
 
 # Required python packages
 
