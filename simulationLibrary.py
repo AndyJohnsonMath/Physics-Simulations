@@ -382,7 +382,7 @@ def update(objects,dt=1/30):
         objects[i].velocity = objects[i].velocity+(objects[i].acceleration*dt)
         objects[i].position = objects[i].position+(objects[i].velocity*dt)
 
-def gravitySimulation(kind='random', numParticles = 10, bod=np.array([0],dtype='object'), numFrames=500, clean=True):
+def gravitySimulation(kind='random', numParticles = 10, numFrames=500, bod=np.array([0],dtype='object'), clean=True):
     """
     Description
     -----------
@@ -759,17 +759,17 @@ def handleParticleCollision(pa,pb):
         pa.position = temp3
         pb.position = temp4
         
-#Since this is a discreet colission simulation this function is for updating the state of the simulation
-def updateCollision(dt):
-    p1.velocity = p1.velocity+(p1.acceleration*dt)
-    p1.position = p1.position+(p1.velocity*dt)
-    p1.KE = (1/2)*p1.mass*np.dot(p1.velocity,p1.velocity)
+# #Since this is a discreet colission simulation this function is for updating the state of the simulation
+# def updateCollisionBruteDorce(dt):
+#     p1.velocity = p1.velocity+(p1.acceleration*dt)
+#     p1.position = p1.position+(p1.velocity*dt)
+#     p1.KE = (1/2)*p1.mass*np.dot(p1.velocity,p1.velocity)
     
-    p2.velocity = p2.velocity+(p2.acceleration*dt)
-    p2.position = p2.position+(p2.velocity*dt)
-    p2.KE = (1/2)*p2.mass*np.dot(p2.velocity,p2.velocity)
+#     p2.velocity = p2.velocity+(p2.acceleration*dt)
+#     p2.position = p2.position+(p2.velocity*dt)
+#     p2.KE = (1/2)*p2.mass*np.dot(p2.velocity,p2.velocity)
     
-    p1.handleBoxCollision(box)
-    p2.handleBoxCollision(box)
+#     p1.handleBoxCollision(box)
+#     p2.handleBoxCollision(box)
     
-    handleParticleCollision(p1,p2)
+#     handleParticleCollision(p1,p2)
