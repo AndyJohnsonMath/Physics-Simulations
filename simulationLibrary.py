@@ -3,8 +3,13 @@ import matplotlib.pyplot as plt
 import math
 import os
 import time
+from tqdm import tqdm
 
 ################################################ Quality of Life #############################################################################################################################################
+
+# Self Explanatory
+def size(array):
+    print(np.shape(array))
 
 def clearDirectory(direc='./Images for simulation'):
     """
@@ -236,22 +241,26 @@ class PointMassBody:
         self.velocity = velocity
         self.acceleration = acceleration
 
-def randParticleGravity(massMean=1*10**12, massStdDev=100000000000, posStdDev = 15, velStdDev = 0.2):
+def randParticle(massMean=1*10**12, massStdDev=100000000000, posMean = 0, posStdDev = 15, velMean = 0, velStdDev = 0.2, type='gravity'):
     """
     Description
     -----------
-    randParticleGravity() just generates a random particle ~10^12kg in mass.
+    randParticleGravity() just generates a random particle with Gaussian-ly distributed mass, position and velocity.
 
     Parameters
     ----------
     massMean : float
-        mean of the randomly decided mass. Default argument arbitrarily chosen.
+        mean of the randomly decided mass. Default argument arbitrarily chosen tailored for gravity simulations.
     massStdDev : float
-        standard deviation mass of the randomly decided mass. Default argument arbitrarily chosen.
+        standard deviation mass of the randomly decided mass. Default argument arbitrarily chosen tailored for gravity simulations.
+    posMean : float
+        mean of the randomly decided position. Default argument arbitrarily chosen tailored for gravity simulations.
     posStdDev : float
-        standard deviation mass of the randomly decided position. Default argument arbitrarily chosen.
+        standard deviation mass of the randomly decided position. Default argument arbitrarily chosen tailored for gravity simulations.
+    velMean : float
+        mean of the randomly decided velocity. Default argument arbitrarily chosen tailored for gravity simulations.
     velStdDev : float
-        standard deviation mass of the randomly decided velocity. Default argument arbitrarily chosen.
+        standard deviation mass of the randomly decided velocity. Default argument arbitrarily chosen tailored for gravity simulations.
 
     Returns
     -------
@@ -262,21 +271,24 @@ def randParticleGravity(massMean=1*10**12, massStdDev=100000000000, posStdDev = 
     mass = np.random.normal(loc=massMean,scale=massStdDev)
     
     #Declare randomly assigned positions and make sure it doesnt go out of bounds
-    posx = np.random.normal(scale=posStdDev)
-    posy = np.random.normal(scale=posStdDev)
-    if posx >= 80:
+    posx = np.random.normal(loc=posMean, scale=posStdDev)
+    posy = np.random.normal(loc=posMean, scale=posStdDev)
+    if posx < -10 or posx > 10:
         posx = 80
     if posy >= 80:
         posy = 80
     position = np.array([posx,posy])
     
     #Declare randomly assigned positions and make sure it doesnt go out of bounds
-    velx = np.random.normal(scale=velStdDev)
-    vely = np.random.normal(scale=velStdDev)
+    velx = np.random.normal(loc=velMean, scale=velStdDev)
+    vely = np.random.normal(loc=velMean, scale=velStdDev)
     velocity = np.array([velx,vely])
 
     #Generate and return the particle
-    particle = PointMassBody(mass,position,velocity,np.array([0,0]))
+    if type == 'gravity':
+        particle = PointMassBody(mass,position,velocity,np.array([0,0]))
+    else:
+        particle = Particle(mass,position,velocity,np.array([0,0]))
     return(particle)
 
 # generateParticles() takes in an integer argument and generates an array of random particles generated from randParticleGravity()
@@ -415,7 +427,7 @@ def gravitySimulation(kind='random', numParticles = 10, bod=np.array([0],dtype='
     #Start the main loop
     for i in range(numFrames):
         figure, axes = plt.subplots()
-        update(bodies,dt=1/120)
+        update(bodies,dt=1/30)
 
         for j in range(len(bodies)):
             axes.scatter(bodies[j].position[0], bodies[j].position[1], s=1)
@@ -426,10 +438,11 @@ def gravitySimulation(kind='random', numParticles = 10, bod=np.array([0],dtype='
         else:
             pass
         axes.set_aspect('auto')
-        plt.xlim(-200,200)
-        plt.ylim(-100,100)
+        plt.xlim(-200,1500)
+        plt.ylim(-700,700)
 
-        figure.savefig('./Images for simulation/graph'+str(i)+'.png', bbox_inches='tight', pad_inches=0 ,dpi=300)
+        # figure.savefig('./Images for simulation/graph'+str(i)+'.png', bbox_inches='tight', pad_inches=0 ,dpi=300)
+        figure.savefig('./Images for simulation/graph'+str(i)+'.png', bbox_inches='tight', pad_inches=0)
         plt.close('all')
 
 
@@ -632,3 +645,111 @@ def lorenzAttractorTrace(frames, s=10, r=28, b=2.667, clean=False, rotation=Fals
             plt.close('all')
             frame = frame + 1
             angle = angle + 1
+
+######################################### This marks the start of the collision detection stuff #########################################################################################################################################################################################################
+
+#Class defining a particle used in the simulation
+class Particle:
+    def __init__(self, mass, position, velocity, acceleration, box):
+        
+        self.mass = mass
+        self.radius = math.sqrt(self.mass/(math.pi*1.5))
+        self.position = position
+        self.velocity = velocity
+        self.acceleration = acceleration
+        self.KE = (1/2)*self.mass*np.dot(self.velocity,self.velocity)
+
+    # Use properties for the particle boundaries
+    @property
+    def left(self):
+        return self.position[0] - self.radius
+    
+    @property
+    def right(self):
+        return self.position[0] + self.radius
+    
+    @property
+    def top(self):
+        return self.position[1] + self.radius
+    
+    @property
+    def bottom(self):
+        return self.position[1] - self.radius
+    
+    #Method that detects if there is a colision between the particle and the box
+    def handleBoxCollision(self, box):
+        #cor is the coefficient of restitution
+        cor = 0.9
+        if self.left <= box.left or self.right >= box.right:
+            self.velocity[0]=-self.velocity[0]
+        
+        if self.bottom <= box.bottom or self.top >= box.top:
+            self.velocity[1]=-self.velocity[1]
+    
+        #These statements make sure that the ball is put back into the box, rather than letting it clip though
+        if self.top >= box.top:
+            self.position[1] = box.top - self.radius
+        
+        if self.bottom <= box.bottom:
+            self.position[1] = box.bottom + self.radius
+        
+        if self.left <= box.left:
+            self.position[0] = box.left + self.radius
+        
+        if self.right >= box.right:
+            self.position[0] = box.right - self.radius
+        
+#just defining the box tha5t the simulation takes place in
+class Box:
+    def __init__(self):
+        self.left = -10
+        self.right = 10
+        self.bottom = -10
+        self.top = 10
+
+def handleParticleCollision(pa,pb):
+    if math.dist(pa.position,pb.position) <= (pa.radius+pb.radius):
+        P1 = pa.position
+        P2 = pb.position
+        v1 = pa.velocity
+        v2 = pb.velocity
+        m1 = pa.mass
+        m2 = pb.mass
+
+        r1=pa.radius
+        r2=pb.radius
+
+        a = np.linalg.norm(v1-v2)**2
+        b = 2*np.inner(v1-v2,P1-P2)
+        c= np.linalg.norm(P1-P2)**2-(r1+r2)**2
+
+        # calculating  the discriminant
+        dis = (b**2) - (4 * a*c)
+        
+        # The first result is when they make contact
+        ans1 = (-b-math.sqrt(dis))/(2 * a)
+        
+        temp3 = pa.position+pa.velocity*ans1
+        temp4 = pb.position+pb.velocity*ans1 
+        
+        temp1 = v1-((2*m2)/(m1+m2))*(np.inner(v1-v2,P1-P2)/np.linalg.norm(P1-P2)**2)*(P1-P2)
+        temp2 = v2-((2*m1)/(m1+m2))*(np.inner(v2-v1,P2-P1)/np.linalg.norm(P2-P1)**2)*(P2-P1)
+        pa.velocity = temp1
+        pb.velocity = temp2
+        pa.position = temp3
+        pb.position = temp4
+        
+#Since this is a discreet colission simulation this function is for updating the state of the simulation
+def update(dt):
+    p1.velocity = p1.velocity+(p1.acceleration*dt)
+    p1.position = p1.position+(p1.velocity*dt)
+    p1.KE = (1/2)*p1.mass*np.dot(p1.velocity,p1.velocity)
+    
+    p2.velocity = p2.velocity+(p2.acceleration*dt)
+    p2.position = p2.position+(p2.velocity*dt)
+    p2.KE = (1/2)*p2.mass*np.dot(p2.velocity,p2.velocity)
+    
+    p1.handleBoxCollision(box)
+    p2.handleBoxCollision(box)
+    
+    handleParticleCollision(p1,p2)
