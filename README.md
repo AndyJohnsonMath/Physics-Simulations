@@ -19,6 +19,10 @@ I installed these all on my local machine using ```pip install```. Run these fol
 - ```pip install tqdm```
 - ```pip install ffmpeg```
 
+# Other required packages
+
+Obviously, you will need to add in python3 to your system, but the other big one is to install LaTeX and add it to PATH. This is sexpescially important when running the simulations and producing video since a large majority of the video creation functions will have latex text and math somewhere on the frame. How you choose to do this is entirely up to you, how I chose to do this was by installing through MikTeX (https://miktex.org/download) and following their installation instructions; This method also automatically puts latex in your PATH. If you dont install latex you will get errors.
+
 # General procedure for running on your own machine
 - The main idea with these notebooks is to produce frames for an animation. These frames are saved to a folder called "Images for Simulation". **You need to create this file on your own device.** Once you have it made you will need to replace all the references to its path in the code with your own unique path on your machine. This is a current problem I am addressing and trying to fix so that this process can become more streamlined.
 
