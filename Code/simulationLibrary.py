@@ -4,12 +4,9 @@ import math
 import os
 import time
 from tqdm import tqdm
+import matplotlib as mpl
 
 ################################################ Quality of Life/Miscellanious #############################################################################################################################################
-
-# Self Explanatory
-def size(array):
-    print(np.shape(array))
 
 def clearDirectory(direc='../Images for simulation'):
     """
@@ -516,9 +513,25 @@ def rossler(xyz, a=0.2, b=0.2, c=5.7):
     z_dot = b+(z*(x-c))
     return np.array([x_dot, y_dot, z_dot])
 
-# lorenzAttractorImage() produces an image of a Lorenz Attractor System after 'length' amount of iterations. Also takes system parameters s, r, and b. Default value is just a known value that gives a known result to use as sanity checks
-# 'save' parameter allows you to save the image incase you find something cool
 def lorenzAttractorImage(length, s=10, r=28, b=2.667, save=False, clean=False, initPos=np.array([0,1,1.05])):
+    """
+    Parameters
+    ----------
+    length : int
+       Number of iterations (Segments) you want to have the path length be
+    s,r,b : float
+       Parameters defining the Lorenz attractor
+    save : boolean
+        If true, image will be saved to 'Imeages for simulation' directory
+    clean : boolean
+        If true then all other graph elements will be removed except for what is just being plotted, makes it very clean
+    initPos : arra-like, shape (1,3)
+        Position vector describing the initial position of the system. 
+
+    Returns
+    -------
+    Nothing! But this will produce an single image of the attractor, mainly used for seeing if the attractor can be reproduced at all.
+    """
     dt = 0.01
     num_steps = length
 
@@ -558,6 +571,24 @@ def lorenzAttractorImage(length, s=10, r=28, b=2.667, save=False, clean=False, i
         plt.show()
 
 def thomasAttractorImage(length, b=0.208186, save=False, clean=False, initPos=np.array([0,0,0])):
+    """
+    Parameters
+    ----------
+    length : int
+       Number of iterations (Segments) you want to have the path length be
+    b : float
+       Parameters defining the Lorenz attractor
+    save : boolean
+        If true, image will be saved to 'Imeages for simulation' directory
+    clean : boolean
+        If true then all other graph elements will be removed except for what is just being plotted, makes it very clean
+    initPos : arra-like, shape (1,3)
+        Position vector describing the initial position of the system. 
+
+    Returns
+    -------
+    Nothing! But this will produce an single image of the attractor, mainly used for seeing if the attractor can be reproduced at all.
+    """
     dt = 0.01
     num_steps = length
 
@@ -598,6 +629,24 @@ def thomasAttractorImage(length, b=0.208186, save=False, clean=False, initPos=np
         plt.show()
 
 def rosslerAttractorImage(length, a=0.2, b=0.2, c=5.7, save=False, clean=False, initPos=np.array([0,0,0])):
+    """
+    Parameters
+    ----------
+    length : int
+       Number of iterations (Frames) you want the animation to be
+    a,b,c : float
+       Parameters defining the Rossler attractor
+    save : boolean
+        If true, image will be saved to 'Imeages for simulation' directory
+    clean : boolean
+        If true then all other graph elements will be removed except for what is just being plotted, makes it very clean
+    initPos : arra-like, shape (1,3)
+        Position vector describing the initial position of the system. 
+
+    Returns
+    -------
+    Nothing! But this will produce an single image of the attractor, mainly used for seeing if the attractor can be reproduced at all.
+    """
     dt = 0.01
     num_steps = length
 
@@ -637,6 +686,24 @@ def rosslerAttractorImage(length, a=0.2, b=0.2, c=5.7, save=False, clean=False, 
 # ffmpeg -start_number 0 -framerate 60 -i graph%01d.png video.webm
 
 def lorenzAttractorTrace(frames, s=10, r=28, b=2.667, clean=False, rotation=False,initPos=np.array([0,1,1.05])):
+    """
+    Parameters
+    ----------
+    frames : int
+       Number of iterations (Frames) you want the animation to be
+    s,r,b : float
+       Parameters defining the Lorenz attractor
+    clean : boolean
+        If true then all other graph elements will be removed except for what is just being plotted, makes it very clean
+    rotation : boolean
+        If true, the produced animation will rotate about the origin. Good for artistic reasons
+    initPos : arra-like, shape (1,3)
+        Position vector describing the initial position of the system. 
+
+    Returns
+    -------
+    Nothing! But this will produce all the frames for an animation. Use the ffmpeg command on 'Images for simulation" to finish the animation production
+    """
     #Empty the target directory
     clearDirectory()
 
@@ -722,6 +789,24 @@ def lorenzAttractorTrace(frames, s=10, r=28, b=2.667, clean=False, rotation=Fals
             angle = angle + 1
 
 def rosslerAttractorTrace(frames, a=0.2, b=0.2, c=10, clean=False, rotation=False,initPos=np.array([0,0,0])):
+    """
+    Parameters
+    ----------
+    frames : int
+       Number of iterations (Frames) you want the animation to be
+    a,b,c : float
+       Parameters defining the Rossler attractor
+    clean : boolean
+        If true then all other graph elements will be removed except for what is just being plotted, makes it very clean
+    rotation : boolean
+        If true, the produced animation will rotate about the origin. Good for artistic reasons
+    initPos : arra-like, shape (1,3)
+        Position vector describing the initial position of the system. 
+
+    Returns
+    -------
+    Nothing! But this will produce all the frames for an animation. Use the ffmpeg command on 'Images for simulation" to finish the animation production
+    """
     #Empty the target directory
     clearDirectory()
 
@@ -889,6 +974,8 @@ class Particle:
         
         if self.right >= box.right:
             self.position[0] = box.right - self.radius
+
+############################################################### Collision Detection stuff ######################################################################################################################################################
         
 #just defining the box tha5t the simulation takes place in
 class Box:
