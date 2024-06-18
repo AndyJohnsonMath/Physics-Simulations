@@ -1031,3 +1031,123 @@ def handleParticleCollision(pa,pb):
 #     p2.handleBoxCollision(box)
     
 #     handleParticleCollision(p1,p2)
+
+######################################################################## Start of wave equation stuff #################################################################################################
+
+def waveSimulation(initialFunc, c=1, length=1, totalTime=5, Nx=200, Nt=1000):
+    """
+    Description
+    -----------
+    A function for numerically solving the 1D wave equation and plotting each frame of its simulation.
+
+    Parameters
+    ----------
+    initialFunc : Function
+        Function defining the first initial condition.
+    c : Float
+       Wave eq parameter.
+    length : Float
+        Length of the spatial dimension
+    totalTime : Float
+        Total time of the simulation
+    Nx : int
+        Total number of discrete points in the spatial dimension
+    Nt : int
+        Total number of discrete points in the temporal dimention
+    
+    Returns 
+    -------
+    Nothing. But! Creates all the frames of the simulation in the titular "Images for Simulation" file to then be used with ffmpeg (ffmpeg -start_number 0 -framerate 60 -i graph%01d.png video.webm)
+    """
+    # Lets create a meshed function
+    length = length
+    c=c
+    totalTime = totalTime
+    Nx = Nx # x axis
+    Nt = Nt # t axis
+    deltax = length/(Nx-1) # THIS IS THE IMPORTANT LINE OR ELSE IT BLOWS UP!!!!!!!!!!!!!!!!!!!! I HAVE NO CLUE WHY THAT -1 NEEDS TO BE THERE BUT IT DOES OR EVERYTHING GOES TO SHIT
+    deltat = totalTime/Nt
+    C=c*(deltat/deltax)
+    if C >=1 :
+        print("C is greater than 1. C="+str(C))
+        sys.exit(1)
+    
+    x=np.linspace(0,length,Nx)
+    t=np.linspace(0,totalTime, Nt)
+    
+    u=np.zeros((Nt, Nx))
+    u[0]=initialFunc(x)
+    u[1]=u[0]
+    for n in tqdm(range(1,Nt-1)):
+        for i in range(1,Nx-1): # All interior points
+            u[n+1,i]=(2 * (1 - C**2) * u[n, i] - u[n - 1, i] + C**2 * (u[n, i + 1] + u[n, i - 1]))
+
+    sim.clearDirectory()
+    for i in tqdm(range(Nt)):
+        plt.plot(u[i])
+        plt.xlim(0,Nx)
+        plt.ylim(-5,5)
+        plt.savefig('../..//Physics-Simulations/Images for simulation/graph'+str(i)+'.png') # dpi argument increases resolution
+        plt.close('all')
+
+def dampedWaveSimulation(initialFunc, c=1, gamma=1, length=1, totalTime=5, Nx=200, Nt=1000):
+    """
+    Description
+    -----------
+    A function for numerically solving the 1D wave equation and plotting each frame of its simulation.
+
+    Parameters
+    ----------
+    initialFunc : Function
+        Function defining the first initial condition.
+    c : Float
+       Wave eq parameter.
+    gamma : Float
+        Dampening Parameter
+    length : Float
+        Length of the spatial dimension
+    totalTime : Float
+        Total time of the simulation
+    Nx : int
+        Total number of discrete points in the spatial dimension
+    Nt : int
+        Total number of discrete points in the temporal dimention
+    
+    Returns 
+    -------
+    Nothing. But! Creates all the frames of the simulation in the titular "Images for Simulation" file to then be used with ffmpeg (ffmpeg -start_number 0 -framerate 60 -i graph%01d.png video.webm)
+    """
+    # Lets create a meshed function
+    length = length
+    c=c
+    gamma = gamma
+    totalTime = totalTime
+    Nx = Nx # x axis
+    Nt = Nt # t axis
+    deltax = length/(Nx-1) # THIS IS THE IMPORTANT LINE OR ELSE IT BLOWS UP!!!!!!!!!!!!!!!!!!!! I HAVE NO CLUE WHY THAT -1 NEEDS TO BE THERE BUT IT DOES OR EVERYTHING GOES TO SHIT
+    deltat = totalTime/Nt
+    C=c*(deltat/deltax)
+    if C >=1 :
+        print("C is greater than 1. C="+str(C))
+        sys.exit(1)
+    
+    x=np.linspace(0,length,Nx)
+    t=np.linspace(0,totalTime, Nt)
+    
+    u_initial = np.exp(-((x - 0.1)**2) / (2 * sigma**2))
+    v_initial = (A * v * (x - x_0) / sigma**2) * np.exp(-((x - x_0)**2) / (2 * sigma**2))
+    
+    u=np.zeros((Nt, Nx))
+    u[0]=initialFunc(x)
+    u[1]=u[0]
+    for n in tqdm(range(1,Nt-1)):
+        for i in range(1,Nx-1): # All interior points
+            u[n+1,i]=(1/(1+gamma*deltat))*((2*u[n, i]*(1-gamma*deltat))-(u[n-1,i]*(1-gamma*deltat))+(C**2)*(u[n,i+1]-2*u[n,i]+u[n,i-1]))
+            
+    sim.clearDirectory()
+    for i in tqdm(range(Nt)):
+        plt.plot(u[i])
+        plt.xlim(0,Nx)
+        plt.ylim(-5,5)
+        plt.savefig('../..//Physics-Simulations/Images for simulation/graph'+str(i)+'.png') # dpi argument increases resolution
+        plt.close('all')
