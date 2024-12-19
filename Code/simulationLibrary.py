@@ -5,8 +5,12 @@ import os
 import time
 from tqdm import tqdm
 import matplotlib as mpl
+import sys
 
 ################################################ Quality of Life/Miscellanious #############################################################################################################################################
+
+def testFunction():
+    print("Yup, im here!")
 
 def clearDirectory(direc='../Images for simulation'):
     """
@@ -1082,7 +1086,7 @@ def waveSimulation(initialFunc, c=1, length=1, totalTime=5, Nx=200, Nt=1000):
         for i in range(1,Nx-1): # All interior points
             u[n+1,i]=(2 * (1 - C**2) * u[n, i] - u[n - 1, i] + C**2 * (u[n, i + 1] + u[n, i - 1]))
 
-    sim.clearDirectory()
+    clearDirectory()
     for i in tqdm(range(Nt)):
         plt.plot(u[i])
         plt.xlim(0,Nx)
