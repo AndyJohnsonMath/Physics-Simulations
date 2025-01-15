@@ -6,6 +6,8 @@ import time
 from tqdm import tqdm
 import matplotlib as mpl
 import sys
+from PyPDF2 import PdfMerger
+import re
 
 ################################################ Quality of Life/Miscellanious #############################################################################################################################################
 
@@ -30,6 +32,49 @@ def clearDirectory(direc='../Images for simulation'):
     dir = direc
     for f in os.listdir(dir):
         os.remove(os.path.join(dir, f))
+
+def combinePDFs(directory = r'../Images for simulation', filename="combined.pdf"):
+    """
+    Description
+    -----------
+    Combines all of the pdf's in a target directory into a single pdf ordered by number.
+
+    Parameters
+    ----------
+    directory : string
+        The directory containing the pdf's to be merged. Default argument is a file that comes along with the github.
+    filename : string
+        Name of the combined pdf file.
+
+    Returns
+    -------
+    Nothing. But! This function does produce the combined pdf inside of the target directory.
+    """
+    # Create a PdfMerger object
+    merger = PdfMerger()
+    
+    # Get all PDF files in the directory
+    pdf_files = [f for f in os.listdir(directory) if f.endswith('.pdf')]
+    
+    # Sort files by the numerical value in their names
+    def extract_number(filename):
+        match = re.search(r'\d+', filename)  # Find the first number in the filename
+        return int(match.group()) if match else 0  # Return 0 if no number is found
+    
+    pdf_files.sort(key=lambda x: extract_number(x))
+    
+    # Merge each PDF file
+    for pdf in pdf_files:
+        pdf_path = os.path.join(directory, pdf)
+        print(f"Adding {pdf}...")
+        merger.append(pdf_path)
+    
+    # Write the combined PDF to a file
+    output_path = os.path.join(directory, filename)
+    merger.write(output_path)
+    merger.close()
+    
+    print(f"All PDFs combined into {output_path}")
 
 ################################################ Numerical Methods #########################################################################################################
 
